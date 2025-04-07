@@ -1,83 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Find Internships</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-  <style>
-    /* Map Styling */
-    #leaflet-map {
-      width: 100%;
-      height: 500px;
-      border-radius: 10px;
+<script>
+  const map = L.map("map").setView([20, 0], 2);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
+
+  const countryCoordinates = {
+    "France": [46.603354, 1.888334],
+    "Germany": [51.1657, 10.4515],
+    "USA": [37.0902, -95.7129],
+    "Japan": [36.2048, 138.2529],
+    "UK": [55.3781, -3.4360]
+    // Add more countries as needed
+  };
+
+  const proposals = JSON.parse(localStorage.getItem("proposals")) || [];
+
+  proposals.forEach((proposal) => {
+    const coords = countryCoordinates[proposal.country];
+    if (coords) {
+      const marker = L.marker(coords).addTo(map);
+      marker.bindPopup(`
+        <strong>${proposal.title}</strong><br>
+        ${proposal.description}<br>
+        <a href="${proposal.link}" target="_blank">View</a>
+      `);
     }
-    footer {
-      height: 50px;
-      background-color: #f8f9fa;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="container mt-4">
-    <a href="index.html" class="btn btn-secondary mb-3">← Back to Home</a>
-    <h2 class="mb-4">Find Internships</h2>
-
-    <!-- Map Section -->
-    <div id="leaflet-map"></div>
-
-    <!-- List of Internship Proposals (Optional) -->
-    <ul id="internship-list"></ul>
-  </div>
-
-  <footer class="text-center d-flex align-items-center justify-content-center">
-    <p class="mb-0">Made by Adama & Suraj & Vuk</p>
-  </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-
-  <script>
-    // Load stored internships
-    const internships = JSON.parse(localStorage.getItem("internships")) || [];
-
-    // Initialize the map
-    const map = L.map('leaflet-map').setView([20, 0], 2);
-
-    // Add OpenStreetMap tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    // Function to add markers for each country where internships are available
-    internships.forEach(internship => {
-      // Get country name and coordinates (you could use a more complex method to get coordinates based on the country name)
-      const country = internship.country;
-      const coords = getCountryCoordinates(country);  // A function to get coordinates of the country
-      if (coords) {
-        const { lat, lon } = coords;
-        // Create a marker for the country
-        const marker = L.marker([lat, lon]).addTo(map);
-        marker.bindPopup(`
-          <strong>${internship.title}</strong><br>
-          <a href="${internship.link}" target="_blank">More Info</a><br>
-          ${internship.description}
-        `);
-      }
-    });
-
-    // Dummy function to get country coordinates (You should ideally use a geocoding API for real data)
-    function getCountryCoordinates(country) {
-      const countryCoordinates = {
-        "USA": { lat: 37.0902, lon: -95.7129 },
-        "Canada": { lat: 56.1304, lon: -106.3468 },
-        "UK": { lat: 51.5074, lon: -0.1278 },
-        // Add more countries and their coordinates
-      };
-      return countryCoordinates[country];
-    }
-  </script>
-</body>
-</html>
+  });
+</script>
